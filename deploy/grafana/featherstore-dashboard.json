@@ -1,0 +1,11 @@
+{
+  "title": "Featherstore MVP",
+  "schemaVersion": 39,
+  "panels": [
+    {"type":"timeseries","title":"Request rate","targets":[{"expr":"sum by (path,status) (rate(featherstore_http_requests_total[5m]))"}]},
+    {"type":"timeseries","title":"p99 latency","targets":[{"expr":"histogram_quantile(0.99, sum by (le,path) (rate(featherstore_http_request_duration_seconds_bucket[5m])))"}]},
+    {"type":"timeseries","title":"Error rate","targets":[{"expr":"sum by (kind) (rate(featherstore_errors_total[5m]))"}]},
+    {"type":"timeseries","title":"Store rows","targets":[{"expr":"featherstore_store_rows"}]},
+    {"type":"timeseries","title":"Ingest rows/sec","targets":[{"expr":"sum by (entity,status) (rate(featherstore_ingest_rows_total[5m]))"}]}
+  ]
+}

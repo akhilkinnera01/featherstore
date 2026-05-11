@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "featherstore.fullname" . }}
+  labels:
+    {{- include "featherstore.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "featherstore.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "featherstore.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+      annotations:
+        {{- if and .Values.metrics.enabled (not .Values.metrics.serviceMonitor.enabled) }}
+        prometheus.io/scrape: "true"
+        prometheus.io/port: {{ .Values.server.port | quote }}
+        prometheus.io/path: /metrics
+        {{- end }}
+    spec:
+      serviceAccountName: {{ include "featherstore.serviceAccountName" . }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: featherstore
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.server.port }}
+          env:
+            - name: FEATHERSTORE_BIND_ADDR
+              value: "0.0.0.0:{{ .Values.server.port }}"
+            - name: FEATHERSTORE_LOG_FORMAT
+              value: {{ .Values.server.logFormat | quote }}
+            - name: FEATHERSTORE_MAX_REQUEST_BYTES
+              value: {{ .Values.server.maxRequestBytes | int64 | quote }}
+            - name: FEATHERSTORE_PERSIST_SNAPSHOT
+              value: {{ .Values.server.snapshot.persist | quote }}
+            - name: FEATHERSTORE_LOAD_SNAPSHOT_ON_START
+              value: {{ .Values.server.snapshot.loadOnStart | quote }}
+            {{- if .Values.server.snapshot.enabled }}
+            - name: FEATHERSTORE_SNAPSHOT_PATH
+              value: {{ .Values.server.snapshot.path | quote }}
+            {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- if .Values.server.snapshot.enabled }}
+          volumeMounts:
+            - name: snapshot
+              mountPath: {{ .Values.server.snapshot.mountPath }}
+          {{- end }}
+      {{- if .Values.server.snapshot.enabled }}
+      volumes:
+        - name: snapshot
+          {{- if .Values.server.snapshot.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "featherstore.fullname" . }}-snapshot
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -1,0 +1,24 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "featherstore"
+version = "0.1.0"
+description = "Python SDK and benchmark client for Featherstore"
+readme = "../README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [{name = "Featherstore contributors"}]
+dependencies = ["httpx>=0.27"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "respx>=0.21", "pytest-asyncio>=0.23"]
+
+[project.scripts]
+featherstore-load-synthetic = "featherstore.cli:load_synthetic_main"
+featherstore-benchmark = "featherstore.benchmark:benchmark_main"
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]

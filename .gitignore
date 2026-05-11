@@ -1,0 +1,9 @@
+/target/
+/.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+benchmark-*.json
+*.snapshot
+/site/
+.DS_Store

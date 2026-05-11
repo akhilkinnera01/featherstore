@@ -1,0 +1,6 @@
+apiVersion: v2
+name: featherstore
+description: Rust online feature store for synthetic recommendation workloads
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

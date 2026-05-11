@@ -1,0 +1,17 @@
+{{- if and .Values.server.snapshot.enabled .Values.server.snapshot.persistence.enabled -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "featherstore.fullname" . }}-snapshot
+  labels:
+    {{- include "featherstore.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    {{- toYaml .Values.server.snapshot.persistence.accessModes | nindent 4 }}
+  resources:
+    requests:
+      storage: {{ .Values.server.snapshot.persistence.size }}
+  {{- if .Values.server.snapshot.persistence.storageClassName }}
+  storageClassName: {{ .Values.server.snapshot.persistence.storageClassName | quote }}
+  {{- end }}
+{{- end }}

@@ -1,0 +1,8 @@
+Featherstore has been installed.
+
+Health check from inside the cluster:
+  kubectl -n {{ .Release.Namespace }} run featherstore-curl --rm -i --restart=Never --image=curlimages/curl -- \
+    curl -fsS http://{{ include "featherstore.fullname" . }}:{{ .Values.service.port }}/healthz
+
+Port-forward for local validation:
+  kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "featherstore.fullname" . }} 8080:{{ .Values.service.port }}
