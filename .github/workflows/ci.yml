@@ -134,7 +134,7 @@ jobs:
           import json
           data=json.load(open('benchmark-smoke.json'))
           assert data['status'] in {'proven','not_proven'}
-          assert data['environment']['target_qps'] == 100
+          assert data['target_qps'] == 100
           PY
       - uses: actions/upload-artifact@v4
         with:
