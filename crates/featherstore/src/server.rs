@@ -97,7 +97,7 @@ async fn ingest_batch(
             state
                 .metrics
                 .ingest_rows
-                .with_label_values(&[&entity, "accepted"])
+                .with_label_values(&[entity.as_str(), "accepted"])
                 .inc_by(summary.accepted_rows as u64);
             record_store_stats(&state);
             record_http(
@@ -125,14 +125,17 @@ async fn lookup(
                 state
                     .metrics
                     .lookup_rows
-                    .with_label_values(&[&row.entity, if row.found { "true" } else { "false" }])
+                    .with_label_values(&[
+                        row.entity.as_str(),
+                        if row.found { "true" } else { "false" },
+                    ])
                     .inc();
             }
             for entity in entities {
                 state
                     .metrics
                     .lookup_requests
-                    .with_label_values(&[&entity, "ok"])
+                    .with_label_values(&[entity.as_str(), "ok"])
                     .inc();
             }
             record_http(
@@ -170,12 +173,12 @@ async fn get_features(
             state
                 .metrics
                 .lookup_requests
-                .with_label_values(&[&entity, "ok"])
+                .with_label_values(&[entity.as_str(), "ok"])
                 .inc();
             state
                 .metrics
                 .lookup_rows
-                .with_label_values(&[&entity, if row.found { "true" } else { "false" }])
+                .with_label_values(&[entity.as_str(), if row.found { "true" } else { "false" }])
                 .inc();
             record_http(
                 &state,
@@ -225,12 +228,12 @@ fn record_http(state: &AppState, method: &str, path: &str, status: StatusCode, s
     state
         .metrics
         .http_requests
-        .with_label_values(&[method, path, &status_s])
+        .with_label_values(&[method, path, status_s.as_str()])
         .inc();
     state
         .metrics
         .http_duration
-        .with_label_values(&[method, path, &status_s])
+        .with_label_values(&[method, path, status_s.as_str()])
         .observe(seconds);
 }
 
@@ -241,7 +244,7 @@ fn record_store_stats(state: &AppState) {
         state
             .metrics
             .store_rows
-            .with_label_values(&[&entity])
+            .with_label_values(&[entity.as_str()])
             .set(rows as i64);
     }
 }

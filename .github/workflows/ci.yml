@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: '1.78'
+          toolchain: '1.81'
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
       - run: cargo fmt --check
@@ -95,7 +95,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: '1.78'
+          toolchain: '1.81'
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
