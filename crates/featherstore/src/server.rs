@@ -125,7 +125,10 @@ async fn lookup(
                 state
                     .metrics
                     .lookup_rows
-                    .with_label_values(&[&row.entity, if row.found { "true" } else { "false" }])
+                    .with_label_values(&[
+                        row.entity.as_str(),
+                        if row.found { "true" } else { "false" },
+                    ])
                     .inc();
             }
             for entity in entities {
@@ -175,7 +178,10 @@ async fn get_features(
             state
                 .metrics
                 .lookup_rows
-                .with_label_values(&[&entity, if row.found { "true" } else { "false" }])
+                .with_label_values(&[
+                    entity.as_str(),
+                    if row.found { "true" } else { "false" },
+                ])
                 .inc();
             record_http(
                 &state,
