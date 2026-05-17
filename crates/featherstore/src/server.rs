@@ -178,10 +178,7 @@ async fn get_features(
             state
                 .metrics
                 .lookup_rows
-                .with_label_values(&[
-                    entity.as_str(),
-                    if row.found { "true" } else { "false" },
-                ])
+                .with_label_values(&[entity.as_str(), if row.found { "true" } else { "false" }])
                 .inc();
             record_http(
                 &state,
